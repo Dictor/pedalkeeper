@@ -6,9 +6,6 @@ import json
 import numpy as np
 import torch
 
-train_dataset_name = "back6"
-verify_dataset_name = "street2"
-
 def getVideoScene(scene_name):
   video_scene = {}
   video_scene_path = "./scene/video_scene_{}.json".format(scene_name)
@@ -31,19 +28,36 @@ def getVideoScene(scene_name):
   
   return video_scene
 
-train_video_scene = getVideoScene(train_dataset_name)
-train_pedal_scene = PedalToScene([{'sec': 0.0, 'pedal': 0}, {'sec': 7.0, 'pedal': 1}], len(train_video_scene), 60) 
+# train set setting
+train_dataset_name = ["back6"]
+train_pedal_scene = [
+  [{'sec': 0.0, 'pedal': 0}, {'sec': 7.0, 'pedal': 1}],
+  
+]
+generate_train_set_video = False
+
+# verify set setting
+verify_dataset_name = "street2"
 verify_video_scene = getVideoScene(verify_dataset_name)
 verify_pedal_scene = PedalToScene([{'sec': 0.0, 'pedal': 0}, {'sec': 10.0, 'pedal': 1}], len(verify_video_scene), 60)
 
-#ArrayToMp4(verify_video_scene, verify_pedal_scene, "output.mp4", 60)
+
+if generate_train_set_video:
+  for name in train_dataset_name:
+    ArrayToMp4(name, train_pedal_scene, "{name}.mp4", 60)
+
 if os.path.exists("./model.save"):
   print("checkpoint found")
   model = mobilevit_pedalkeeper()
   model.load_state_dict(torch.load("./model.save"))
 else:
   print("train and generate checkpoint")
-  model = Train(train_video_scene, train_pedal_scene, 3)
+  model = mobilevit_pedalkeeper()
+  
+  for i in range(len(train_dataset_name)):
+    train_video_scene = getVideoScene(train_dataset_name[i])
+    model = Train(model, train_video_scene, PedalToScene(train_pedal_scene[i], len(train_video_scene), 60), 20)
+  
   torch.save(model.state_dict(), "./model.save")
 
 Verify(model, verify_video_scene, verify_pedal_scene)
