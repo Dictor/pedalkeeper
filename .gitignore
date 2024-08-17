@@ -1,0 +1,5 @@
+*.pyc
+*.mp4
+model.save
+bag/*
+scene/*

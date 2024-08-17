@@ -10,8 +10,7 @@ def mobilevit_pedalkeeper():
     channels = [16, 32, 64, 64, 96, 96, 128, 128, 160, 160, 640]
     return MobileViT((256, 256), dims, channels, num_classes=1)
 
-def Train(video_scene, pedal_scene, num_epochs=20):
-    model = mobilevit_pedalkeeper()
+def Train(model, video_scene, pedal_scene, num_epochs=20):
     criterion = nn.MSELoss()  # 예시: 분류 문제
     optimizer = optim.Adam(model.parameters(), lr=0.05)
 
@@ -54,7 +53,9 @@ def Verify(model, video_scene, pedal_scene):
             # output = model(torch.Tensor([[video_scene[i][0:480, 80:560]]]))
             # 256 256
             output = model(torch.Tensor([[video_scene[i][112:368, 192:448]]]))
-            if output > 0.5:
+            if output > 0.5 and pedal_scene[i] > 0.5:
+                correct += 1
+            elif output < 0.5 and pedal_scene[i] < 0.5:
                 correct += 1
 
     accuracy = 100 * correct / len(video_scene)
