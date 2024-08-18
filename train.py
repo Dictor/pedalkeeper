@@ -37,7 +37,7 @@ def Train(model, video_scene, pedal_scene, num_epochs=20):
 
             # 학습 과정 출력 (선택 사항)
             if i % 100 == 0:
-                print(f"Epoch [{epoch}/{num_epochs}], Scene [{i}/{len(video_scene)}], Loss: {loss.item():.4f}")
+                print(f"[Train] Epoch [{epoch}/{num_epochs}], Scene [{i}/{len(video_scene)}], Loss: {loss.item():.4f}")
                 
     return model
 
@@ -59,4 +59,4 @@ def Verify(model, video_scene, pedal_scene):
                 correct += 1
 
     accuracy = 100 * correct / len(video_scene)
-    print(f'Accuracy on the test set: {accuracy:.2f}%')
+    print(f'[Verify] Accuracy on the test set: {accuracy:.2f}%')

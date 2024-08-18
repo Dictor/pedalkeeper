@@ -3,3 +3,4 @@ einpos
 tqdm
 rosbags
 opencv-python
+orjson

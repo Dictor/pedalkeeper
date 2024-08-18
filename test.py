@@ -2,7 +2,7 @@ from rosbag import GetEventsFromRosBag, EventsToScene, PedalToScene
 from video import ArrayToMp4
 from train import Train, mobilevit_pedalkeeper, Verify
 import os
-import json
+import orjson
 import numpy as np
 import torch
 
@@ -10,12 +10,12 @@ def getVideoScene(scene_name):
   video_scene = {}
   video_scene_path = "./scene/video_scene_{}.json".format(scene_name)
   if os.path.exists(video_scene_path):
-    print("found video scene file {}".format(video_scene_path))
-    with open(video_scene_path, 'r') as f:
-      video_scene = json.load(f)
+    print("[getVideoScene] found video scene file {}".format(video_scene_path))
+    with open(video_scene_path, 'rb') as f:
+      video_scene = orjson.loads(f.read())
     video_scene = np.array(video_scene)
   else:
-    print("generate video scene file {}".format(video_scene_path))
+    print("[getVideoScene] generate video scene file {}".format(video_scene_path))
     events = GetEventsFromRosBag('./bag/{}.bag'.format(scene_name), './bag/{}.json'.format(scene_name))
     video_scene = EventsToScene(events)
     
@@ -23,9 +23,10 @@ def getVideoScene(scene_name):
     for frame in video_scene:
       converted_video_scene.append(frame.tolist())
       
-    with open(video_scene_path, 'w') as f:
-      json.dump(converted_video_scene, f)
+    with open(video_scene_path, 'wb') as f:
+      f.write(orjson.dumps(converted_video_scene))
   
+  print("[getVideoScene] scene file {} finished".format(video_scene_path))
   return video_scene
 
 # train set setting
