@@ -54,6 +54,9 @@ def EventsToScene(events, size=(640, 480)):
 # data e.g.: [{'sec': 0.0, 'pedal': 1}, {'sec': 5.0, 'pedal': 0}]
 def PedalToScene(data, scene_length, fps):
   scene = []
+  if not data:
+    return scene
+  
   for i in range(scene_length):
     scene.append(0.0)
   

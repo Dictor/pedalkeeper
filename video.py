@@ -19,7 +19,7 @@ def ArrayToMp4(video_scene, pedal_scene, filename, fps=30):
     for i in range(len(video_scene)):
         # 0-1 값을 0-255로 변환하여 uint8 형태로 변환
         frame = (video_scene[i] * 255).astype(np.uint8)
-        cv2.putText(frame, "pedal = {}".format(pedal_scene[i]), (10, 50), cv2.FONT_HERSHEY_DUPLEX , 1, (100,0,100))
+        cv2.putText(frame, "pedal = {}".format(pedal_scene[i] if pedal_scene else "-"), (10, 50), cv2.FONT_HERSHEY_DUPLEX , 1, (100,0,100))
         out.write(frame)
 
     out.release()

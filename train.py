@@ -6,19 +6,22 @@ import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 
 def mobilevit_pedalkeeper():
+    print('[mobilevit_pedalkeeper] init')
     dims = [144, 192, 240]
     channels = [16, 32, 64, 64, 96, 96, 128, 128, 160, 160, 640]
     return MobileViT((256, 256), dims, channels, num_classes=1)
 
 def Train(model, video_scene, pedal_scene, num_epochs=20):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('[Train] Using device:', device)
+    
     criterion = nn.MSELoss()  # 예시: 분류 문제
     optimizer = optim.Adam(model.parameters(), lr=0.05)
 
-    video_tensor = torch.Tensor([video_scene])
-    pedal_tensor = torch.Tensor([pedal_scene])
+    video_tensor = torch.Tensor([video_scene]).to(device)
+    pedal_tensor = torch.Tensor([pedal_scene]).to(device)
 
-    dataset = TensorDataset(video_tensor, pedal_tensor)
-    dataloader = DataLoader(dataset) 
+    model.to(device)
 
     for epoch in range(num_epochs):
         for i in range(len(video_scene)):
@@ -27,11 +30,11 @@ def Train(model, video_scene, pedal_scene, num_epochs=20):
             # 순전파
             # output = model(torch.Tensor([[video_scene[i][0:480, 80:560]]]))
             # 256 256
-            output = model(torch.Tensor([[video_scene[i][112:368, 192:448]]]))
-            loss = criterion(output, torch.Tensor([[pedal_scene[i]]]))
+            optimizer.zero_grad()
+            output = model(torch.Tensor([[video_scene[i][112:368, 192:448]]]).to(device))
+            loss = criterion(output, torch.Tensor([[pedal_scene[i]]]).to(device))
 
             # 역전파 및 최적화
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
