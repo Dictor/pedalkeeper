@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from mobilevit import MobileViT
+from mobilevit import MobileViT, mobilevit_xxs
 import numpy as np
 from torch.utils.data import TensorDataset, DataLoader
 
@@ -31,7 +31,7 @@ def Train(model, video_scene, pedal_scene, num_epochs=20):
             # output = model(torch.Tensor([[video_scene[i][0:480, 80:560]]]))
             # 256 256
             optimizer.zero_grad()
-            output = model(torch.Tensor([[video_scene[i][112:368, 192:448]]]).to(device))
+            output = model(torch.Tensor([video_scene[i][:, 112:368, 192:448]]).to(device))
             loss = criterion(output, torch.Tensor([[pedal_scene[i]]]).to(device))
 
             # 역전파 및 최적화
@@ -55,7 +55,7 @@ def Verify(model, video_scene, pedal_scene):
             # 순전파
             # output = model(torch.Tensor([[video_scene[i][0:480, 80:560]]]))
             # 256 256
-            output = model(torch.Tensor([[video_scene[i][112:368, 192:448]]]))
+            output = model(torch.Tensor([video_scene[i][:, 112:368, 192:448]]))
             if output > 0.5 and pedal_scene[i] > 0.5:
                 correct += 1
             elif output < 0.5 and pedal_scene[i] < 0.5:
@@ -63,3 +63,5 @@ def Verify(model, video_scene, pedal_scene):
 
     accuracy = 100 * correct / len(video_scene)
     print(f'[Verify] Accuracy on the test set: {accuracy:.2f}%')
+    
+mobilevit_xxs()(torch.randn(1, 3, 256, 256))

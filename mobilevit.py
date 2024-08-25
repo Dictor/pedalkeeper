@@ -173,7 +173,7 @@ class MobileViT(nn.Module):
 
         L = [2, 4, 3]
 
-        self.conv1 = conv_nxn_bn(1, channels[0], stride=2)
+        self.conv1 = conv_nxn_bn(3, channels[0], stride=2)
 
         self.mv2 = nn.ModuleList([])
         self.mv2.append(MV2Block(channels[0], channels[1], 1, expansion))
